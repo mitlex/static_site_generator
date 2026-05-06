@@ -24,11 +24,12 @@ Args:
     from_path: path to source markdown file
     template_path: path to an html template file
     dest_path: location where the final html file will be written to disk (parent directories are created as needed)
+    basepath: URL prefix used to rewrite root-relative links (href="/..." and src="/...") so the site works when hosted under a subdirectory
 
 Returns:
     None
 """
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     #read both files and store content in str variables
@@ -43,7 +44,7 @@ def generate_page(from_path, template_path, dest_path):
     #get title and content, inject into html template
     content = markdown_to_html_node(md).to_html()
     title = extract_title(md)
-    new_html = html_template.replace("{{ Title }}", title).replace("{{ Content }}", content)
+    new_html = html_template.replace("{{ Title }}", title).replace("{{ Content }}", content).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
     #write new html to dest_path, creating directories as necessary
     dest_path_dirs = os.path.dirname(dest_path)
@@ -62,11 +63,12 @@ Args:
     dir_path_content: path to source directory
     template_path: path to an html template file
     dest_dir_path: location where the final html file will be written to disk (parent directories are created as needed by generate_page function)
+    basepath: URL prefix forwarded to generate_page function for rewriting root-relative links
 
 Returns:
     None
 """
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     src_entries = os.listdir(dir_path_content)
 
     for entry in src_entries:
@@ -77,7 +79,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         # Example: content/index.md -> public/index.html
         if os.path.isfile(entry_path):
             dest_path = Path(os.path.join(dest_dir_path, entry)).with_suffix('.html')
-            generate_page(entry_path, template_path, dest_path)
+            generate_page(entry_path, template_path, dest_path, basepath)
         else:
             dest_path = os.path.join(dest_dir_path, entry)
-            generate_pages_recursive(entry_path, template_path, dest_path)
+            generate_pages_recursive(entry_path, template_path, dest_path, basepath)
