@@ -1,15 +1,20 @@
 import shutil
 import os
 
-"""
-copy_dir_content: 
-Deletes a given destination folder and recreates it fresh before recursively copying all contents from a given source folder into the new destination folder. 
-Deletion of the destination folder only happens once before the recursive copying sequence begins.
-
-Input: source directory, destination directory
-Returns: None
-"""
 def copy_dir_content(src, dst):
+    """Recursively copies contents from source to destination.
+
+    Deletes the destination directory if it exists and recreates it before 
+    starting the copy process. All files and subdirectories are copied 
+    recursively.
+
+    Args:
+        src (str): The path to the source directory.
+        dst (str): The path to the destination directory.
+
+    Returns:
+        None
+    """
     if os.path.exists(dst):
         shutil.rmtree(dst)
     os.mkdir(dst)

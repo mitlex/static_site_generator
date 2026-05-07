@@ -3,33 +3,43 @@ import os
 from markdown_blocks import markdown_to_html_node
 from pathlib import Path
 
-"""
-extract_title: 
-Pulls the '# ' header from the given md file string and returns it. If no '# ' header exists - raise an exception.
-"""
 def extract_title(markdown):
+    """Extracts the main H1 header from a markdown string.
+
+    Scans the provided markdown text for a line starting with '# '. 
+    Returns the text of the header with leading and trailing whitespace removed.
+
+    Args:
+        markdown (str): The raw markdown string to parse.
+
+    Returns:
+        str: The text content of the H1 header.
+
+    Raises:
+        Exception: If no line starting with '# ' is found in the input.
+    """
     lines = markdown.split("\n")
     for line in lines:
         if line.startswith("# "):
             return line[2:].strip()
     raise Exception("Provided markdown does not contain a '# ' heading")
 
-"""Generate an HTML page from a markdown file and template.
-
-Reads markdown from from_path, converts it to HTML, extracts the
-title, injects both into the template, and writes the result to
-dest_path.
-
-Args:
-    from_path: path to source markdown file
-    template_path: path to an html template file
-    dest_path: location where the final html file will be written to disk (parent directories are created as needed)
-    basepath: URL prefix used to rewrite root-relative links (href="/..." and src="/...") so the site works when hosted under a subdirectory
-
-Returns:
-    None
-"""
 def generate_page(from_path, template_path, dest_path, basepath):
+    """Generate an HTML page from a markdown file and template.
+
+    Reads markdown from from_path, converts it to HTML, extracts the
+    title, injects both into the template, and writes the result to
+    dest_path.
+
+    Args:
+        from_path: path to source markdown file
+        template_path: path to an html template file
+        dest_path: location where the final html file will be written to disk (parent directories are created as needed)
+        basepath: URL prefix used to rewrite root-relative links (href="/..." and src="/...") so the site works when hosted under a subdirectory
+
+    Returns:
+        None
+    """
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     #read both files and store content in str variables
@@ -52,23 +62,23 @@ def generate_page(from_path, template_path, dest_path, basepath):
     with open(dest_path, mode="w") as f:
         f.write(new_html)
 
-"""Recursively crawls a directory tree generating HTML files for all md files found
-
-Iterates through current dir_path_content directory entries.
-if a file is found, calls generate_page function to generate an HTML page.
-Page is written to a destination path.
-otherwise (if entry is a sub-directory) recursively calls itself with the sub-directory.
-
-Args:
-    dir_path_content: path to source directory
-    template_path: path to an html template file
-    dest_dir_path: location where the final html file will be written to disk (parent directories are created as needed by generate_page function)
-    basepath: URL prefix forwarded to generate_page function for rewriting root-relative links
-
-Returns:
-    None
-"""
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
+    """Recursively crawls a directory tree generating HTML files for all md files found
+
+    Iterates through current dir_path_content directory entries.
+    if a file is found, calls generate_page function to generate an HTML page.
+    Page is written to a destination path.
+    otherwise (if entry is a sub-directory) recursively calls itself with the sub-directory.
+
+    Args:
+        dir_path_content: path to source directory
+        template_path: path to an html template file
+        dest_dir_path: location where the final html file will be written to disk (parent directories are created as needed by generate_page function)
+        basepath: URL prefix forwarded to generate_page function for rewriting root-relative links
+
+    Returns:
+        None
+    """
     src_entries = os.listdir(dir_path_content)
 
     for entry in src_entries:

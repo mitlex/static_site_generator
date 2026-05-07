@@ -1,44 +1,24 @@
 from textnode import *
 import re
 
-"""
-split_nodes_delimiter function allows us to create TextNodes from raw Markdown strings.
-
-inputs:
-old_nodes = list of TextNodes
-delimiter (e.g. ` is the code delimiter in markdown, ** for bold, _ for italic)
-text type (e.g. TextType.CODE, matching the delimiter)
-
-returns:
-new list of TextNodes, where any "text" type nodes in the input list are potentially split into multiple TextNodes based on the syntax.
-
-e.g.
-
-node = TextNode("This is text with a `code block` word", TextType.TEXT)
-new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-
-new_nodes becomes:
-
-[
-    TextNode("This is text with a ", TextType.TEXT),
-    TextNode("code block", TextType.CODE),
-    TextNode(" word", TextType.TEXT),
-]
-
-Note: for simplicity, this function will not handle nested inline text types (e.g. "This is an _italic and **bold** word_.")
-Note: this function does handle cases like "hello **my name is** Bob and **I am a bold person**"
-
-Note: to handle blocks of text containing multiple delimiters:
-
-e.g. ("hello `this is code` and **this is bold**!")
-
-You need to chain function calls like so:
-
-node = TextNode("hello `this is code` and **this is bold**!", TextType.TEXT)
-nodes = split_nodes_delimiter([node], "`", TextType.CODE) # First pass: handle code
-nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD) # Second pass, handle bold
-"""
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    """Splits text-type nodes into multiple nodes based on a markdown delimiter.
+
+    Iterates through a list of nodes and identifies text nodes containing the
+    specified delimiter. It splits the content, alternating between regular 
+    text and the new text_type. Non-text nodes are preserved as-is.
+
+    Args:
+        old_nodes (list): A list of TextNode objects.
+        delimiter (str): The markdown character(s) to split by (e.g., "**", "`").
+        text_type (TextType): The type to assign to the delimited text.
+
+    Returns:
+        list: A new list of TextNode objects with the split content.
+
+    Raises:
+        Exception: If a closing delimiter is not found (odd number of parts).
+    """
     new_nodes = []
 
     for old_node in old_nodes:
@@ -59,14 +39,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
     return new_nodes
 
-"""
-Input: 
-list of TextNodes
-
-Returns: 
-new list of TextNodes, where any "text" type nodes in the input list are potentially split into multiple TextNodes if a markdown link is contained in the text
-"""
 def split_nodes_link(old_nodes):
+    """Splits text nodes into multiple nodes by extracting markdown links.
+
+    Processes a list of nodes and identifies markdown link syntax: [anchor](url).
+    Text nodes containing links are broken into regular text nodes and link nodes.
+    Non-text nodes are appended to the new list unchanged.
+
+    Args:
+        old_nodes (list): A list of TextNode objects to process.
+
+    Returns:
+        list: A new list of TextNode objects where links have been isolated.
+    """
     new_nodes = []
 
     for old_node in old_nodes:
@@ -90,14 +75,19 @@ def split_nodes_link(old_nodes):
                     new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     return new_nodes
 
-"""
-Input: 
-list of TextNodes
-
-Returns: 
-new list of TextNodes, where any "text" type nodes in the input list are potentially split into multiple TextNodes if a markdown image is contained in the text
-"""
 def split_nodes_image(old_nodes):
+    """Splits text nodes into multiple nodes by extracting markdown images.
+
+    Processes a list of nodes and identifies markdown image syntax: ![alt text](url).
+    Text nodes containing images are broken into regular text nodes and image nodes.
+    Non-text nodes are preserved in the list.
+
+    Args:
+        old_nodes (list): A list of TextNode objects to process.
+
+    Returns:
+        list: A new list of TextNode objects where images have been isolated.
+    """
     new_nodes = []
 
     for old_node in old_nodes:
@@ -121,12 +111,18 @@ def split_nodes_image(old_nodes):
                     new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     return new_nodes
 
-"""
-Input: raw markdown text
-
-Returns: a list of TextNodes
-"""
 def text_to_textnodes(text):
+    """Converts a raw markdown string into a list of specialized TextNodes.
+
+    This function applies a sequence of splitting rules to process inline 
+    markdown syntax including bold, italic, code blocks, images, and links.
+
+    Args:
+        text (str): The raw markdown string to be parsed.
+
+    Returns:
+        list: A list of TextNode objects representing the parsed content.
+    """
     nodes = [TextNode(text, TextType.TEXT)]
     new_nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
     new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
@@ -135,20 +131,34 @@ def text_to_textnodes(text):
     new_nodes = split_nodes_link(new_nodes)
     return new_nodes
 
-"""
-Input: raw markdown text
-
-Returns: List of tuples (anchor text, URL) of markdown links contained within input text
-"""
 def extract_markdown_links(text):
+    """Extracts markdown link components from a string using regex.
+
+    Identifies standard markdown links while explicitly ignoring image 
+    syntax by using a negative lookbehind for the '!' character.
+
+    Args:
+        text (str): The raw markdown string to search.
+
+    Returns:
+        list of tuple: A list of tuples, where each tuple contains 
+            (anchor_text, url).
+    """
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
-"""
-Input: raw markdown text
-
-Returns: List of tuples (alttext, URL) of markdown images contained within input text
-"""
 def extract_markdown_images(text):
+    """Extracts markdown image components from a string using regex.
+
+    Identifies markdown image syntax specifically by looking for the leading
+    '!' followed by brackets and parentheses.
+
+    Args:
+        text (str): The raw markdown string to search.
+
+    Returns:
+        list of tuple: A list of tuples, where each tuple contains 
+            (alt_text, url).
+    """
     return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
 
 
