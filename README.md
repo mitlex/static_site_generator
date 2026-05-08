@@ -1,5 +1,7 @@
 # Static Site Generator
 
+**[🌐 View the Live Demo](https://mitlex.github.io/static_site_generator/)**
+
 A Python-based build tool that transforms a directory of Markdown files into a structured HTML website. This project focuses on the low-level implementation of a transformation pipeline, moving from raw text to structured objects, and finally to disk-backed HTML.
 
 ## 🏗 System Architecture
