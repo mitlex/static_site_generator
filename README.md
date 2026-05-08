@@ -34,7 +34,7 @@ graph TD
     E --> F[Template Injection]
     F --> G[Final HTML in /docs]
     
-    style E fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#01579b
 ```
 
 ## 🧪 Testing & Reliability
