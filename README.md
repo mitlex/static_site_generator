@@ -54,3 +54,11 @@ The project is backed by a comprehensive suite of unit tests using the `unittest
 
 ### Technical Focus
 This project avoids third-party libraries to demonstrate an understanding of **recursive file system operations**, **Regular Expression pattern matching**, and the **Composite Design Pattern**. By building the parser manually, the project ensures a lightweight, zero-dependency build process.
+
+---
+
+## 🎓 Acknowledgments
+
+This project was developed as part of the [Back-End Development Path](https://www.boot.dev/tracks/backend) on [Boot.dev](https://www.boot.dev). 
+
+Special thanks to the Boot.dev team for providing the architectural constraints and guided lessons that made this deep dive into static site generation possible.
